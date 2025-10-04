@@ -19,6 +19,7 @@ public class ProtoCurveController {
     private Canvas canvas;
 
     ArrayList<Point2D> points = new ArrayList<Point2D>();
+    private final double STEP = 0.001;
     final int POINT_RADIUS = 3;
 
     @FXML
@@ -50,6 +51,9 @@ public class ProtoCurveController {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         drawPointsAndLine(graphicsContext);
+        if (points.size() > 2) {
+            drawBezierCurve(graphicsContext);
+        }
     }
 
     private void handlePrimaryClick(GraphicsContext graphicsContext, MouseEvent event) {
@@ -67,6 +71,7 @@ public class ProtoCurveController {
 
         if (points.size() > 0) {
             graphicsContext.setStroke(Color.BLACK);
+
             for (int i = 0; i< points.size()-1; i++){
                 Point2D curr = points.get(i);
                 Point2D next = points.get(i+1);
@@ -74,6 +79,16 @@ public class ProtoCurveController {
             }
         }
     }
+    private void drawBezierCurve(GraphicsContext graphicsContext){
+        List<Point2D> bezierPoints = BezierCurve.calculateBezierCurve(points, STEP);
 
+        graphicsContext.setStroke(Color.RED);
+        graphicsContext.setLineWidth(2);
 
+        for (int i = 0; i < bezierPoints.size() - 1; i++) {
+            Point2D current = bezierPoints.get(i);
+            Point2D next = bezierPoints.get(i + 1);
+            graphicsContext.strokeLine(current.getX(), current.getY(), next.getX(), next.getY());
+        }
+    }
 }
